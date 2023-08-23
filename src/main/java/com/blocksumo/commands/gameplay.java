@@ -1,12 +1,14 @@
 package com.blocksumo.commands;
 
+import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabExecutor;
 import org.bukkit.entity.Player;
-
 import java.util.ArrayList;
 import java.util.List;
+
+import static com.blocksumo.BlockSumo.getPlugin;
 
 public class gameplay implements TabExecutor {
     @Override
