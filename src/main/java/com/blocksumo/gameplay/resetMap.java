@@ -8,10 +8,6 @@ import java.io.IOException;
 
 public class resetMap {
     private void regenMap() throws IOException {
-        StructureManager manager = Bukkit.getStructureManager();
-        File struct = new File(); /*TODO: Make this configurable*/
-
-        Structure arena = manager.loadStructure(struct);
-
+        //StructureManager manager = Bukkit.getStructureManager();
     }
 }
