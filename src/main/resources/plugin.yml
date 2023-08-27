@@ -1,0 +1,11 @@
+name: BlockSumo
+version: '${version}'
+main: com.blocksumo.BlockSumo
+api-version: 1.20
+authors: [ 24Kings ]
+
+commands:
+  sumo:
+    usage: /sumo
+    description: Basic gameplay functions for Block Sumo
+    permission: op
