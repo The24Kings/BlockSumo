@@ -6,7 +6,7 @@ import org.bukkit.structure.StructureManager;
 import java.io.File;
 import java.io.IOException;
 
-public class resetMap {
+public class ResetMap {
     private void regenMap() throws IOException {
         //StructureManager manager = Bukkit.getStructureManager();
     }

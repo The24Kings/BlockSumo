@@ -10,7 +10,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 
-public class playerOutOfBounds implements Listener {
+public class PlayerOutOfBounds implements Listener {
     @EventHandler
     public void arenaBounds(BlockPlaceEvent event) {
         if(event.getPlayer() == null) {

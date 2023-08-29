@@ -13,9 +13,9 @@ import java.util.logging.Logger;
 
 import static com.blocksumo.BlockSumo.getPlugin;
 import static com.blocksumo.BlockSumo.getWorld;
-import static com.blocksumo.listeners.playerDeath.*;
+import static com.blocksumo.listeners.PlayerDeath.*;
 
-public class gameplayCommands implements TabExecutor {
+public class GameplayCommands implements TabExecutor {
     static Logger logger = Bukkit.getLogger();
 
     @Override

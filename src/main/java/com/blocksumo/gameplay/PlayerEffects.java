@@ -10,7 +10,7 @@ import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.util.Random;
 
-public class playerEffects implements Listener {
+public class PlayerEffects implements Listener {
     private static Material getRandomWoolColor() throws NoSuchAlgorithmException {
         Random random = SecureRandom.getInstanceStrong();
         int num = random.nextInt(1, 17);

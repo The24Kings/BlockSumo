@@ -1,9 +1,9 @@
 package com.blocksumo;
 
-import com.blocksumo.commands.gameplayCommands;
-import com.blocksumo.gameplay.playerEffects;
-import com.blocksumo.listeners.playerDeath;
-import com.blocksumo.listeners.playerOutOfBounds;
+import com.blocksumo.commands.GameplayCommands;
+import com.blocksumo.gameplay.PlayerEffects;
+import com.blocksumo.listeners.PlayerDeath;
+import com.blocksumo.listeners.PlayerOutOfBounds;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -36,11 +36,11 @@ public class BlockSumo extends JavaPlugin {
     }
 
     private void registerCommandsAndEvents () {
-        getServer().getPluginManager().registerEvents(new playerOutOfBounds(), plugin);
-        getServer().getPluginManager().registerEvents(new playerEffects(), plugin);
-        getServer().getPluginManager().registerEvents(new playerDeath(), plugin);
+        getServer().getPluginManager().registerEvents(new PlayerOutOfBounds(), plugin);
+        getServer().getPluginManager().registerEvents(new PlayerEffects(), plugin);
+        getServer().getPluginManager().registerEvents(new PlayerDeath(), plugin);
 
-        getCommand("sumo").setExecutor(new gameplayCommands());
-        getCommand("sumo").setTabCompleter(new gameplayCommands());
+        getCommand("sumo").setExecutor(new GameplayCommands());
+        getCommand("sumo").setTabCompleter(new GameplayCommands());
     }
 }

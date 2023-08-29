@@ -19,7 +19,7 @@ import java.util.logging.Logger;
 import static com.blocksumo.BlockSumo.getPlugin;
 import static com.blocksumo.BlockSumo.getWorld;
 
-public class playerDeath implements Listener {
+public class PlayerDeath implements Listener {
     private static Map<UUID, Integer> playerLives = new HashMap<>();
     static Logger logger = Bukkit.getLogger();
 
