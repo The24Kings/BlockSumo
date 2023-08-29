@@ -8,6 +8,8 @@ import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import static com.blocksumo.listeners.PlayerDeath.destroyPlayerList;
+
 public class BlockSumo extends JavaPlugin {
 
     private static World world;
@@ -32,6 +34,7 @@ public class BlockSumo extends JavaPlugin {
 
     @Override
     public void onDisable() {
+        destroyPlayerList();
         Bukkit.getLogger().info("Disabled Block Sumo!");
     }
 

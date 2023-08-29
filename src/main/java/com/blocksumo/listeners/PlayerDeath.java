@@ -1,5 +1,8 @@
 package com.blocksumo.listeners;
 
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.TextColor;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
@@ -21,14 +24,13 @@ import static com.blocksumo.BlockSumo.getWorld;
 
 public class PlayerDeath implements Listener {
     private static Map<UUID, Integer> playerLives = new HashMap<>();
+    private final Location respawnPoint = new Location(getWorld(), 0, -45, -1);
     static Logger logger = Bukkit.getLogger();
 
     public static void createPlayerList() {
         for(Player online : getWorld().getPlayers()) {
             playerLives.put(online.getUniqueId(), 5);
         }
-
-        logger.info("Created Map");
     }
 
     public static Map<UUID, Integer> getAlivePlayers() {
@@ -41,7 +43,6 @@ public class PlayerDeath implements Listener {
 
     public static void destroyPlayerList() {
         playerLives.clear();
-        logger.info("Successfully Deleted Map");
     }
 
     private void zeroLivesLeft() {
@@ -50,36 +51,43 @@ public class PlayerDeath implements Listener {
 
     //TODO: Respawn the player based on how to actual game does. Currently just a place holder.
     private void killPlayer(Player player, UUID identifier) {
-        Location respawnPoint = new Location(getWorld(), 0, -45, -1);
-        String name = getPlugin().getServer().getPlayer(identifier).getName();
+        String name = player.getName();
 
-        player.setGameMode(GameMode.SPECTATOR);
-        player.teleport(respawnPoint);
+        player.playSound(respawnPoint, Sound.BLOCK_NOTE_BLOCK_PLING,1,1);
 
-        player.playSound(player.getLocation(), Sound.BLOCK_NOTE_BLOCK_PLING,1,1);
+        if(player.teleport(respawnPoint)) { player.setGameMode(GameMode.SPECTATOR); }
 
         int delay = 20 * 5; //5-Second respawn delay based on ticks
-        int lives = playerLives.get(identifier);
+        Integer lives = playerLives.get(identifier);
 
         try {
             playerLives.replace(identifier, lives, lives - 1);
-            logger.info("Player: " + name + " now has " + playerLives.get(identifier) + " lives!");
+
+            getWorld().sendMessage(Component.text(name + " has " + getPlayerLives(identifier) + " live(s) remaining", NamedTextColor.RED));
 
             if(lives - 1 == 0) { //Keep player in spectator if they have 0 lives
-                logger.info("Player has 0 lives left.");
+                getWorld().sendMessage(Component.text(name + " lost.", NamedTextColor.RED));
                 zeroLivesLeft();
                 return;
             }
 
-        } catch(NullPointerException e) {
-            Bukkit.getLogger().warning("Unable to decrement the lives of player" + name + "!");
+        } catch(IllegalArgumentException e) {
+            Bukkit.getLogger().severe("Unable to decrement the lives of player" + name + "!");
         }
 
         Bukkit.getScheduler().runTaskLater(getPlugin(), () -> {
-            logger.info("Started Player Respawn Counter.");
-
             player.setGameMode(GameMode.SURVIVAL);
         }, delay);
+    }
+
+    @EventHandler
+    public void cancelMovementWhenDead(PlayerMoveEvent event) {
+        if(!event.hasChangedPosition()) { return; }                             // If player has expressly moved location - ignore head movement
+        if(event.getPlayer().getGameMode() != GameMode.SPECTATOR) { return; }   // If player is not in spectator, return
+        if(getPlayerLives(event.getPlayer().getUniqueId()) == 0) { return; }    // If player has no lives, return
+
+        event.getPlayer().teleport(respawnPoint); // TODO: Apply the player's current facing direction, rather than default to 0
+        //event.setCancelled(true);
     }
 
     @EventHandler
@@ -87,11 +95,11 @@ public class PlayerDeath implements Listener {
         Player player = event.getPlayer();
         UUID identifier = player.getUniqueId();
 
-        if(player.getLocation().getY() > -60) { //Trigger if player is below threshold of y -60
-            return;
-        }
+        // If player is above -60 or in spectator -> return
+        if(player.getLocation().getY() > -60 || player.getGameMode() == GameMode.SPECTATOR) { return; }
 
-        logger.info("Player is below threshold.");
+        //TODO: team colors?
+        getWorld().sendMessage(Component.text(player.getName(), NamedTextColor.RED).append(Component.text(" fell into the void.", NamedTextColor.WHITE)));
 
         killPlayer(player, identifier);
     }
@@ -101,7 +109,8 @@ public class PlayerDeath implements Listener {
         Player player = event.getPlayer();
         UUID identifier = player.getUniqueId();
 
-        logger.info("Player died.");
+        //TODO: team colors?
+        getWorld().sendMessage(Component.text(player.getName(), NamedTextColor.RED).append(Component.text(" has died.")));
 
         killPlayer(player, identifier);
     }
