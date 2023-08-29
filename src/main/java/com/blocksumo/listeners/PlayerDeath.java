@@ -76,7 +76,7 @@ public class PlayerDeath implements Listener {
         //TODO: Respawn Counter
         Bukkit.getScheduler().runTaskLater(getPlugin(), () -> {
             player.setGameMode(GameMode.SURVIVAL);
-            player.teleport(respawnPoint.subtract(0, 5, 0));
+            player.teleport(new Location(getWorld(), 0, -50, 0));
         }, delay);
     }
 
