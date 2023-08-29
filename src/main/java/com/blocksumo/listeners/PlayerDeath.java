@@ -2,7 +2,6 @@ package com.blocksumo.listeners;
 
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
-import net.kyori.adventure.text.format.TextColor;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
@@ -13,7 +12,6 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
@@ -24,7 +22,7 @@ import static com.blocksumo.BlockSumo.getWorld;
 
 public class PlayerDeath implements Listener {
     private static Map<UUID, Integer> playerLives = new HashMap<>();
-    private final Location respawnPoint = new Location(getWorld(), 0, -45, -1);
+    private final Location respawnPoint = new Location(getWorld(), 0, -45, 0);
     static Logger logger = Bukkit.getLogger();
 
     public static void createPlayerList() {
@@ -75,19 +73,11 @@ public class PlayerDeath implements Listener {
             Bukkit.getLogger().severe("Unable to decrement the lives of player" + name + "!");
         }
 
+        //TODO: Respawn Counter
         Bukkit.getScheduler().runTaskLater(getPlugin(), () -> {
             player.setGameMode(GameMode.SURVIVAL);
+            player.teleport(respawnPoint.subtract(0, 5, 0));
         }, delay);
-    }
-
-    @EventHandler
-    public void cancelMovementWhenDead(PlayerMoveEvent event) {
-        if(!event.hasChangedPosition()) { return; }                             // If player has expressly moved location - ignore head movement
-        if(event.getPlayer().getGameMode() != GameMode.SPECTATOR) { return; }   // If player is not in spectator, return
-        if(getPlayerLives(event.getPlayer().getUniqueId()) == 0) { return; }    // If player has no lives, return
-
-        event.getPlayer().teleport(respawnPoint); // TODO: Apply the player's current facing direction, rather than default to 0
-        //event.setCancelled(true);
     }
 
     @EventHandler

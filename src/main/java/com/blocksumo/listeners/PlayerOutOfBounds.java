@@ -1,49 +1,59 @@
 package com.blocksumo.listeners;
 
-import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.format.TextColor;
-import org.bukkit.Bukkit;
+import org.bukkit.GameMode;
 import org.bukkit.Location;
-import org.bukkit.World;
+import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockPlaceEvent;
-import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.event.player.PlayerMoveEvent;
+
+import static com.blocksumo.BlockSumo.getWorld;
 
 public class PlayerOutOfBounds implements Listener {
+    private final Location center = new Location(getWorld(), 0, -45, 0);
+
+    public double calculateDistanceBetweenPoints(
+            double x1,
+            double z1,
+            double x2,
+            double z2) {
+        return Math.sqrt((z2 - z1) * (z2 - z1) + (x2 - x1) * (x2 - x1));
+    }
+
     @EventHandler
-    public void arenaBounds(BlockPlaceEvent event) {
-        if(event.getPlayer() == null) {
-            return;
-        }
+    public void cancelBlockPlacementOutOfBounds(BlockPlaceEvent event) {
+        Location block = event.getBlockPlaced().getLocation();
 
-        World world = event.getBlockPlaced().getWorld();
+        //Clamp to a 20 block diameter cylinder
+        double distance = calculateDistanceBetweenPoints(0, 0, block.getX(), block.getZ());
 
-        Location bounds1 = new Location(world, -16, -60, -16);
-        Location bounds2 = new Location(world, 16, -10, 16);
-
-        Location blockPos = event.getBlockPlaced().getLocation();
-
-        //If Outside X Bound of -16 and 16
-        if(blockPos.getX() < bounds1.getX() || blockPos.getX() > bounds2.getX()) {
-            //Bukkit.getLogger().warn("OUT OF BOUNDS");
+        if(distance > 20.5) {
             event.setCancelled(true);
         }
 
-        //If outside Z Bound of -16 and 16
-        if(blockPos.getZ() < bounds1.getZ() || blockPos.getZ() > bounds2.getZ()) {
-            //Bukkit.getLogger().warn("OUT OF BOUNDS");
+        //Clamp to -60y -> -10y
+        if(block.getY() < -60 || block.getY() > -10) {
             event.setCancelled(true);
         }
+    }
 
-        //If outside Y Bound of -60 and -10
-        if(blockPos.getY() < bounds1.getY() || blockPos.getY() > bounds2.getY()) {
-            //Bukkit.getLogger().warn("OUT OF BOUNDS");
-            if(blockPos.getY() > bounds2.getY()) {
-                event.getPlayer().sendMessage(Component.text("Cannot build this high!").color(TextColor.color(0xE83B31)));
-            }
-            event.setCancelled(true);
+    @EventHandler
+    public void teleportSpectatorOutOfBounds(PlayerMoveEvent event) {
+        Player player = event.getPlayer();
+
+        if(player.getGameMode() != GameMode.SPECTATOR) { return; }
+
+        //Clamp to a 32 block diameter cylinder
+        double distance = calculateDistanceBetweenPoints(0, 0, player.getX(), player.getZ());
+
+        if(distance > 32.5) {
+            player.teleport(center);
         }
 
+        //Clamp to -60y -> -10y
+        if(player.getY() < -60 || player.getY() > -10) {
+            player.teleport(center);
+        }
     }
 }
