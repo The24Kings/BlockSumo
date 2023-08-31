@@ -6,6 +6,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Sound;
+import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -19,6 +20,7 @@ import java.util.logging.Logger;
 
 import static com.blocksumo.BlockSumo.getPlugin;
 import static com.blocksumo.BlockSumo.getWorld;
+import static com.blocksumo.gameplay.InfoDisplay.updatePlayerLife;
 
 public class PlayerDeath implements Listener {
     private static Map<UUID, Integer> playerLives = new HashMap<>();
@@ -43,10 +45,6 @@ public class PlayerDeath implements Listener {
         playerLives.clear();
     }
 
-    private void zeroLivesLeft() {
-
-    }
-
     //TODO: Respawn the player based on how to actual game does. Currently just a place holder.
     private void killPlayer(Player player, UUID identifier) {
         String name = player.getName();
@@ -61,11 +59,15 @@ public class PlayerDeath implements Listener {
         try {
             playerLives.replace(identifier, lives, lives - 1);
 
+            //Update Scoreboard
+            updatePlayerLife(player);
+
             getWorld().sendMessage(Component.text(name + " has " + getPlayerLives(identifier) + " live(s) remaining", NamedTextColor.RED));
 
-            if(lives - 1 == 0) { //Keep player in spectator if they have 0 lives
+            //Keep player in spectator if they have 0 lives
+            if(lives - 1 == 0) {
                 getWorld().sendMessage(Component.text(name + " lost.", NamedTextColor.RED));
-                zeroLivesLeft();
+                getAlivePlayers().remove(identifier);
                 return;
             }
 
@@ -87,6 +89,11 @@ public class PlayerDeath implements Listener {
 
         // If player is above -60 or in spectator -> return
         if(player.getLocation().getY() > -60 || player.getGameMode() == GameMode.SPECTATOR) { return; }
+
+        //No other entities exist in our game, so we can assume it was a player
+        if(player.getLastDamageCause() instanceof LivingEntity) {
+            Player killer = (Player) player.getLastDamageCause().getEntity();
+        }
 
         //TODO: team colors?
         getWorld().sendMessage(Component.text(player.getName(), NamedTextColor.RED).append(Component.text(" fell into the void.", NamedTextColor.WHITE)));

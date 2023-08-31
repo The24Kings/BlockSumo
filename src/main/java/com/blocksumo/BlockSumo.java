@@ -8,6 +8,9 @@ import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import static com.blocksumo.gameplay.InfoDisplay.createBoard;
+import static com.blocksumo.gameplay.InfoDisplay.destroyBoard;
+import static com.blocksumo.listeners.PlayerDeath.createPlayerList;
 import static com.blocksumo.listeners.PlayerDeath.destroyPlayerList;
 
 public class BlockSumo extends JavaPlugin {
@@ -27,14 +30,19 @@ public class BlockSumo extends JavaPlugin {
         world = Bukkit.getWorld("Block Sumo");
         plugin = this;
 
-        Bukkit.getLogger().info("Enabled Block Sumo!");
-
         registerCommandsAndEvents();
+
+        //Create game related tools
+        createPlayerList();
+        createBoard();
+
+        Bukkit.getLogger().info("Enabled Block Sumo!");
     }
 
     @Override
     public void onDisable() {
         destroyPlayerList();
+        destroyBoard();
         Bukkit.getLogger().info("Disabled Block Sumo!");
     }
 
